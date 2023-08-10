@@ -5,7 +5,7 @@
 --  user_id, a users.id value (you can assume user_id is linked to an existing users)
 -- Tips:
 --  Calculate-Weighted-Average
-DELIMITER //
+DELIMITER $$
 
 CREATE PROCEDURE ComputeAverageWeightedScoreForUser (IN user_id INT)
 BEGIN
@@ -16,5 +16,7 @@ BEGIN
     ON projects.id = corrections.project_id
     where corrections.user_id = user_id)
     where users.id = user_id;
-END $$
+END;
+$$
+
 DELIMITER ;
