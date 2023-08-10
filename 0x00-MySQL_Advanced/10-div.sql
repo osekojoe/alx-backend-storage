@@ -8,7 +8,6 @@
 --  And returns a / b or 0 if b == 0
 DELIMITER $$
 
-DROP FUNCTION IF EXISTS SafeDiv;
 CREATE FUNCTION SafeDiv (
 a INT,
 b INT)
