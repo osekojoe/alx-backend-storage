@@ -14,8 +14,8 @@ BEGIN
     FROM corrections
     INNER JOIN projects
     ON projects.id = corrections.project_id
-    where corrections.user_id = user_id)
-    where users.id = user_id;
+    WHERE corrections.user_id = user_id)
+    WHERE users.id = user_id;
 END;
 $$
 
