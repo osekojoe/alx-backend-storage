@@ -9,13 +9,15 @@
 
 DELIMITER $$
 
-CREATE FUNCTION SafeDiv (
-a INT,
-b INT)
+CREATE FUNCTION SafeDiv(a INT, b INT)
 RETURNS FLOAT DETERMINISTIC
 BEGIN
-    RETURN (IF (b = 0, 0, a / b));
+    IF b = 0 THEN
+        RETURN 0;
+    END IF;
+
+    RETURN a / b;
 END;
 $$
 
-DELIMITER;
+DELIMITER ;
