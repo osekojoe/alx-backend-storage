@@ -6,7 +6,7 @@ FOR EACH ROW
 BEGIN
 	UPDATE items
 	SET quantity = quantity - NEW.number
-	WHERE id = NEW.item_id;
+	WHERE NAME = NEW.item_name;
 END;
 //
 
