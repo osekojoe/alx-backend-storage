@@ -9,7 +9,7 @@
 --   score, the score value for the correction
 DELIMITER //
 
-CREATE PROCEDURE AddBonus(IN user_id INT, IN project_name VARCHAR(255), IN score INT)
+CREATE PROCEDURE AddBonus(IN user_id INTEGER, IN project_name VARCHAR(255), IN score INTEGER)
 BEGIN
     INSERT INTO projects(name)
     SELECT project_name FROM DUAL
