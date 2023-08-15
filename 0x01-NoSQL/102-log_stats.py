@@ -23,7 +23,7 @@ def logs_stats():
     special_log_count = all_collections.count_documents(
             {"method": "GET", "path": "/status"})
 
-    print('f{x} logs, count_all_documents')
+    print(f'{count_all_documents} logs')
     print('Methods:')
     print(f'\tmethod GET: {with_get}')
     print(f'\tmethod POST: {with_post}')
