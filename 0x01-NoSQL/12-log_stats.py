@@ -12,7 +12,6 @@ Python script that provides some stats about Nginx logs stored in MongoDB:
         one line with the number of documents with:
             method=GET
             path=/status
-
 '''
 
 
@@ -34,7 +33,7 @@ def logs_stats():
     special_log_count = all_collections.count_documents(
             {"method": "GET", "path": "/status"})
 
-    print('f{x} logs, count_all_documents')
+    print('f{count_all_documents} logs')
     print('Methods:')
     print(f'\tmethod GET: {with_get}')
     print(f'\tmethod POST: {with_post}')
@@ -43,6 +42,7 @@ def logs_stats():
     print(f'\tmethod DELETE: {with_delete}')
     
     print(f'{special_log_count} status check')
+
 
 if __name__ == "__main__":
         logs_stats()
