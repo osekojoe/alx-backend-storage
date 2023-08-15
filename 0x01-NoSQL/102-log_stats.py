@@ -33,7 +33,7 @@ def logs_stats():
     
     print(f'{special_log_count} status check')
 
-    print('IPS:')
+    print('IPs:')
     
     sorted_ips = all_collections.aggregate([
         {
