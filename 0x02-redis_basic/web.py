@@ -15,35 +15,25 @@ from redis.client import Redis
 
 
 def cache_page(method: Callable) -> Callable:
-    ''''''
+    '''Decorator wrapper'''
+
     @wraps(method)
-    def wrapper(self, url: str) -> str:
-        ''''''
-        cached = self._redis.get(url)
-        if cached is not None:
-            return cached.decode("utf-8")
+    def wrapper(url):
+        '''wrapper'''
+        redis.incr(f"count:{url}")
+        cached_content = redis.get(f"cached:{url}")
+        if cached_content is not None:
+            return cached_content.decode("utf-8")
 
-        html = method(self, url)
+        html_content = method(url)
 
-        self._redis.setex(url, 10, html)
+        redis.setex(f"cached:{url}", 10, html_content)
         return html
     return wrapper
 
-
-class Cache:
-    def __init__(self):
-        self._redis = redis.Redis()
-
-    @cache_page
-    def get_page(self, url: str) -> str:
-        '''uses the requests module to obtain the HTML content of
-        a particular URL and returns it.'''
-        response = requests.get(url)
-        return response.text
-
-
-cache = Cache()
-url = "http://slowwly.robertomurray.co.uk"
-
-html = cache.get_page(url)
-print(html)
+@cache_page
+def get_page(url: str) -> str:
+    '''uses the requests module to obtain the HTML content of
+    a particular URL and returns it.'''
+    response = requests.get(url)
+    return response.text
