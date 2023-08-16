@@ -7,28 +7,30 @@ track how many times a particular URL was accessed in the key "count:{url}"
 '''
 
 
-import requests
 import redis
-from functools import wraps
+import requests
 from typing import Callable
-from redis.client import Redis
+from functools import wraps
+
+redis = redis.Redis()
 
 
-def cache_page(method: Callable) -> Callable:
-    '''Decorator wrapper'''
+def cache_page(fn: Callable) -> Callable:
+    """ Decorator wrapper """
 
-    @wraps(method)
+    @wraps(fn)
     def wrapper(url):
-        '''wrapper'''
+        """ Wrapper for decorator guy """
         redis.incr(f"count:{url}")
         cached_content = redis.get(f"cached:{url}")
-        if cached_content is not None:
-            return cached_content.decode("utf-8")
-
-        html_content = method(url)
-
-        redis.setex(f"cached:{url}", 10, html_content)
+        
+        if cached_content:
+            return cached_content.decode('utf-8')
+        
+        html = fn(url)
+        redis.setex(f"cached:{url}", 10, html)
         return html
+
     return wrapper
 
 
