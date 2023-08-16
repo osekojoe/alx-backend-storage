@@ -56,6 +56,7 @@ def call_history(method: Callable) -> Callable:
 
 
 class Cache:
+    '''class to cache'''
     def __init__(self):
         '''store an instance of the Redis client as a private variable
            and flush the instance
