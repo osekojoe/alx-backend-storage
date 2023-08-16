@@ -31,6 +31,7 @@ def cache_page(method: Callable) -> Callable:
         return html
     return wrapper
 
+
 @cache_page
 def get_page(url: str) -> str:
     '''uses the requests module to obtain the HTML content of
