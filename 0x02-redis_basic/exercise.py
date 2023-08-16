@@ -34,6 +34,24 @@ def count_calls(method: Callable) -> Callable:
         return method(self, *args, **kwargs)
     return wrapper
 
+def call_history(method: Callable) -> Callable:
+    '''store the history of inputs and outputs for a particular function.'''
+    
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        '''wrapper method - replace the original method when it's
+        decorated'''
+        input_list_key = method.__qualname__ + ":inputs"
+        output_list_key = method.__qualname__ + ":outputs"
+
+        input_data = str(args)
+        self._redis.rpush(input_list_key, input_data)
+
+        result = method(self, *args, **kwargs)
+
+        self._redis.rpush(output_list_key, str(result))
+        return result
+    return wrapper
 
 class Cache:
     def __init__(self):
@@ -44,6 +62,7 @@ class Cache:
         self._redis.flushdb()
 
     @count_calls
+    @call_history
     def store(self, data: Union[str, bytes, int, float]):
         '''Create a store method that takes a data argument and returns
         a string'''
@@ -69,3 +88,17 @@ class Cache:
         '''automatically parametrize Cache.get with the correct conversion
         function.'''
         return self.get(key, fn=int)
+
+    def replay(self, method: Callable):
+        method_name = method.__qualname__
+        input_list_key = method_name + ":inputs"
+        output_list_key = method_name + ":outputs"
+
+        input_data = self._redis.lrange(input_list_key, 0, -1)
+        output_data = self._redis.lrange(output_list_key, 0, -1)
+
+        print(f"{method_name} was called {len(input_data)} times:")
+        for i in range(len(input_data)):
+            input_args = input_data[i].decode("utf-8")
+            output_result = output_data[i].decode("utf-8")
+            print(f"{method_name}(*{input_args}) -> {output_result}")
