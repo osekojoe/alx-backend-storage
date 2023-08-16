@@ -34,9 +34,10 @@ def count_calls(method: Callable) -> Callable:
         return method(self, *args, **kwargs)
     return wrapper
 
+
 def call_history(method: Callable) -> Callable:
     '''store the history of inputs and outputs for a particular function.'''
-    
+
     @wraps(method)
     def wrapper(self, *args, **kwargs):
         '''wrapper method - replace the original method when it's
@@ -52,6 +53,7 @@ def call_history(method: Callable) -> Callable:
         self._redis.rpush(output_list_key, str(result))
         return result
     return wrapper
+
 
 class Cache:
     def __init__(self):
