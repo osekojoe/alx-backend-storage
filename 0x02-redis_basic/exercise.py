@@ -11,9 +11,28 @@ Type-annotate store correctly. Remember that data can be a str, bytes, int
 '''
 
 
-import uuid
 import redis
-from typing import Union
+import uuid
+from functools import wraps
+from typing import Union, Callable
+from redis.client import Redis
+
+
+type_union = Union[str, bytes, int, float, None]
+
+
+def count_calls(method: Callable) -> Callable:
+    '''count how many times methods of the Cache class are called'''
+    # key = method.__qualname__
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        '''wrapper method - replace the original method when it's
+        decorated'''
+        key = method.__qualname__
+        self._redis.incr(key)
+        return method(self, *args, **kwargs)
+    return wrapper
 
 
 class Cache:
@@ -24,9 +43,29 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]):
         '''Create a store method that takes a data argument and returns
         a string'''
         key = str(uuid.uuid4())
         self._redis.set(key, data)
         return key
+
+    def get(self, key: str, fn: Callable = None) -> type_union:
+        '''convert the data back to the desired format'''
+        data = self._redis.get(key)
+        if data is None:
+            return None
+        if fn is not None:
+            return fn(data)
+        return data
+
+    def get_str(self, key: str) -> Union[str, None]:
+        '''automatically parametrize Cache.get with the correct conversion
+        function.'''
+        return self.get(key, fn=lambda d: d.decode("utf-8"))
+
+    def get_int(self, key: str) -> Union[int, None]:
+        '''automatically parametrize Cache.get with the correct conversion
+        function.'''
+        return self.get(key, fn=int)
